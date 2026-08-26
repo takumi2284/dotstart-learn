@@ -1,0 +1,29 @@
+{
+  "name": "dotboard",
+  "version": "1.0.0",
+  "description": "チームのタスクを張り出して進めるボード",
+  "homepage": "https://github.com/takumi2284/dotstart-learn#readme",
+  "bugs": {
+    "url": "https://github.com/takumi2284/dotstart-learn/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/takumi2284/dotstart-learn.git"
+  },
+  "license": "ISC",
+  "author": "Takumi Hirano",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@hono/node-server": "^2.1.1",
+    "@types/node": "^26.2.0",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "hono": "^4.13.4"
+  }
+}
