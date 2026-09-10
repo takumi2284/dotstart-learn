@@ -1,10 +1,13 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { items, generateId } from "./store.js";
 import { createItemSchema } from "./schema.js";
 import type { Item } from "./types.js";
 
 const app = new Hono();
+
+app.use("*", cors());
 
 app.get("/", (c) => c.text("dotboard"));
 
