@@ -1,5 +1,7 @@
 {
   // Visit https://aka.ms/tsconfig to read more about this file
+  // web/ は独自の tsconfig を持つ別プロジェクトなので対象外にする
+  "include": ["src"],
   "compilerOptions": {
     // File Layout
     "rootDir": "./src",
