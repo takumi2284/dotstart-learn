@@ -5,3 +5,5 @@ export const createItemSchema = z.object({
   note: z.string(),
   rating: z.number().int().min(1).max(5),
 });
+
+export const updateItemSchema = createItemSchema.partial()
