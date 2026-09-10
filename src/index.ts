@@ -8,9 +8,16 @@ import type { Item } from "./types.js";
 const app = new Hono();
 
 // APIに出す形に詰め替える。次に行ける状態は遷移の表から引いて付ける
-const toItem = (item: Item) => ({ ...item, allowedTransitions: nextStatuses(item.status) });
+const toItem = (item: Item) => ({
+  ...item,
+  allowedTransitions: nextStatuses(item.status),
+});
 
 app.get("/", (c) => c.text("dotboard"));
+
+app.get("/health", (c) => {
+  return c.json({ status: "ok" });
+});
 
 app.get("/items", (c) => {
   return c.json(items.map(toItem));
@@ -63,7 +70,10 @@ app.patch("/items/:id", async (c) => {
 
   if (result.data.status && !canTransition(item.status, result.data.status)) {
     return badRequestError(c, [
-      { path: ["status"], message: `${item.status} から ${result.data.status} には変更できません` },
+      {
+        path: ["status"],
+        message: `${item.status} から ${result.data.status} には変更できません`,
+      },
     ]);
   }
 
