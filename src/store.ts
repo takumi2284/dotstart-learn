@@ -1,4 +1,4 @@
-import type { Item } from './types.js'
+import type { Item, Status } from './types.js'
 
 export const items: Item[] = []
 export let nextId = 1
@@ -8,3 +8,16 @@ export const generateId = (): number => {
   nextId += 1
   return id
 }
+
+const allowedTransitions: Record<Status, Status[]> = {
+  open: ['doing'],
+  doing: ['open', 'done'],
+  done: [],
+}
+
+export const canTransition = (from: Status, to: Status): boolean => {
+  if (from === to) return true
+  return allowedTransitions[from].includes(to)
+}
+
+export const nextStatuses = (status: Status): Status[] => allowedTransitions[status]

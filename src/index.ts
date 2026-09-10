@@ -1,15 +1,19 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
-import { items, generateId } from "./store.js";
+import { items, generateId, canTransition, nextStatuses } from "./store.js";
 import { createItemSchema, updateItemSchema } from "./schema.js";
+import { notFoundError, badRequestError } from "./errors.js";
 import type { Item } from "./types.js";
 
 const app = new Hono();
 
+// APIに出す形に詰め替える。次に行ける状態は遷移の表から引いて付ける
+const toItem = (item: Item) => ({ ...item, allowedTransitions: nextStatuses(item.status) });
+
 app.get("/", (c) => c.text("dotboard"));
 
 app.get("/items", (c) => {
-  return c.json(items);
+  return c.json(items.map(toItem));
 });
 
 app.get("/items/:id", (c) => {
@@ -17,10 +21,10 @@ app.get("/items/:id", (c) => {
   const item = items.find((i) => i.id === id);
 
   if (!item) {
-    return c.json({ error: "Not Found" }, 404);
+    return notFoundError(c);
   }
 
-  return c.json(item);
+  return c.json(toItem(item));
 });
 
 app.post("/items", async (c) => {
@@ -28,7 +32,7 @@ app.post("/items", async (c) => {
   const result = createItemSchema.safeParse(body);
 
   if (!result.success) {
-    return c.json({ error: "Bad Request" }, 400);
+    return badRequestError(c, result.error.issues);
   }
 
   const item: Item = {
@@ -39,7 +43,7 @@ app.post("/items", async (c) => {
 
   items.push(item);
 
-  return c.json(item, 201);
+  return c.json(toItem(item), 201);
 });
 
 app.patch("/items/:id", async (c) => {
@@ -47,19 +51,38 @@ app.patch("/items/:id", async (c) => {
   const item = items.find((i) => i.id === id);
 
   if (!item) {
-    return c.json({ error: "Not Found" }, 404);
+    return notFoundError(c);
   }
 
   const body = await c.req.json();
   const result = updateItemSchema.safeParse(body);
 
   if (!result.success) {
-    return c.json({ error: "Bad Request", issues: result.error.issues }, 400);
+    return badRequestError(c, result.error.issues);
+  }
+
+  if (result.data.status && !canTransition(item.status, result.data.status)) {
+    return badRequestError(c, [
+      { path: ["status"], message: `${item.status} から ${result.data.status} には変更できません` },
+    ]);
   }
 
   Object.assign(item, result.data);
 
-  return c.json(item);
+  return c.json(toItem(item));
+});
+
+app.delete("/items/:id", (c) => {
+  const id = Number(c.req.param("id"));
+  const index = items.findIndex((i) => i.id === id);
+
+  if (index === -1) {
+    return notFoundError(c);
+  }
+
+  items.splice(index, 1);
+
+  return c.body(null, 204);
 });
 
 serve(app, (info) => {

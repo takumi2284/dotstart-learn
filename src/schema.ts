@@ -6,4 +6,6 @@ export const createItemSchema = z.object({
   rating: z.number().int().min(1).max(5),
 });
 
-export const updateItemSchema = createItemSchema.partial()
+export const updateItemSchema = createItemSchema.partial().extend({
+  status: z.enum(["open", "doing", "done"]).optional(),
+});
