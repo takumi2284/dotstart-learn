@@ -6,7 +6,7 @@ Step 2 で実装する `GET /items` / `GET /items/:id` / `POST /items` の設計
 
 | フィールド | 型 | 説明 |
 | --- | --- | --- |
-| id | string | 一意なID |
+| id | number | 一意なID |
 | title | string | タイトル |
 | note | string | メモ |
 | rating | number(1-5) | 評価 |
@@ -19,7 +19,7 @@ Step 2 で実装する `GET /items` / `GET /items/:id` / `POST /items` の設計
 | --- | --- | --- | --- | --- |
 | GET | /items | なし | タスク一覧 | 200 |
 | GET | /items/:id | なし | タスク1件 | 200 / 404 |
-| POST | /items | title / note / rating | 作成したタスク1件 | 201 / 400 |
+| POST | /items | title / note / rating / status | 作成したタスク1件 | 201 / 400 |
 | PATCH | /items/:id | 変更したいフィールドだけ | 更新後のタスク1件 | 200 / 400 / 404 |
 | DELETE | /items/:id | なし | なし | 204 / 404 |
 

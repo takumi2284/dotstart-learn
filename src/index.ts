@@ -13,7 +13,13 @@ const toItem = (item: Item) => ({
   allowedTransitions: nextStatuses(item.status),
 });
 
-app.get("/", (c) => c.text("dotboard"));
+items.push({
+  id: generateId(),
+  title: "設計docを書く",
+  note: "docs/api.md にエンドポイント一覧をまとめる",
+  rating: 3,
+  status: "open",
+});
 
 app.get("/health", (c) => {
   return c.json({ status: "ok" });
@@ -45,7 +51,6 @@ app.post("/items", async (c) => {
   const item: Item = {
     id: generateId(),
     ...result.data,
-    status: "open",
   };
 
   items.push(item);
@@ -95,6 +100,6 @@ app.delete("/items/:id", (c) => {
   return c.body(null, 204);
 });
 
-serve(app, (info) => {
+serve({ fetch: app.fetch, port: 3000 }, (info) => {
   console.log(`Listening on http://localhost:${info.port}`);
 });
