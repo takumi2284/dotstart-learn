@@ -1,3 +1,15 @@
+# 依存パッケージの実体。package.json から復元できるので記録しない
 node_modules/
+
+# ビルド生成物。ソースから作り直せるので記録しない
 dist/
+
+# 環境ごとの秘密情報。絶対にコミットしない
 .env
+.env.local
+
+# OS が自動で作るファイル
+.DS_Store
+
+# Prisma Clientの生成物。schema.prismaから再生成できるので記録しない
+/src/generated/prisma

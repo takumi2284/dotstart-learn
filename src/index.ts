@@ -1,15 +1,35 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
-import { items, generateId } from "./store.js";
-import { createItemSchema } from "./schema.js";
+import { cors } from "hono/cors";
+import { items, generateId, canTransition, nextStatuses } from "./store.js";
+import { createItemSchema, updateItemSchema } from "./schema.js";
+import { notFoundError, badRequestError } from "./errors.js";
 import type { Item } from "./types.js";
 
 const app = new Hono();
 
-app.get("/", (c) => c.text("dotboard"));
+app.use("*", cors());
+
+// APIに出す形に詰め替える。次に行ける状態は遷移の表から引いて付ける
+const toItem = (item: Item) => ({
+  ...item,
+  allowedTransitions: nextStatuses(item.status),
+});
+
+items.push({
+  id: generateId(),
+  title: "設計docを書く",
+  note: "docs/api.md にエンドポイント一覧をまとめる",
+  rating: 3,
+  status: "open",
+});
+
+app.get("/health", (c) => {
+  return c.json({ status: "ok" });
+});
 
 app.get("/items", (c) => {
-  return c.json(items);
+  return c.json(items.map(toItem));
 });
 
 app.get("/items/:id", (c) => {
@@ -17,10 +37,10 @@ app.get("/items/:id", (c) => {
   const item = items.find((i) => i.id === id);
 
   if (!item) {
-    return c.json({ error: "Not Found" }, 404);
+    return notFoundError(c);
   }
 
-  return c.json(item);
+  return c.json(toItem(item));
 });
 
 app.post("/items", async (c) => {
@@ -28,20 +48,61 @@ app.post("/items", async (c) => {
   const result = createItemSchema.safeParse(body);
 
   if (!result.success) {
-    return c.json({ error: "Bad Request" }, 400);
+    return badRequestError(c, result.error.issues);
   }
 
   const item: Item = {
     id: generateId(),
     ...result.data,
-    status: "open",
   };
 
   items.push(item);
 
-  return c.json(item, 201);
+  return c.json(toItem(item), 201);
 });
 
-serve(app, (info) => {
+app.patch("/items/:id", async (c) => {
+  const id = Number(c.req.param("id"));
+  const item = items.find((i) => i.id === id);
+
+  if (!item) {
+    return notFoundError(c);
+  }
+
+  const body = await c.req.json();
+  const result = updateItemSchema.safeParse(body);
+
+  if (!result.success) {
+    return badRequestError(c, result.error.issues);
+  }
+
+  if (result.data.status && !canTransition(item.status, result.data.status)) {
+    return badRequestError(c, [
+      {
+        path: ["status"],
+        message: `${item.status} から ${result.data.status} には変更できません`,
+      },
+    ]);
+  }
+
+  Object.assign(item, result.data);
+
+  return c.json(toItem(item));
+});
+
+app.delete("/items/:id", (c) => {
+  const id = Number(c.req.param("id"));
+  const index = items.findIndex((i) => i.id === id);
+
+  if (index === -1) {
+    return notFoundError(c);
+  }
+
+  items.splice(index, 1);
+
+  return c.body(null, 204);
+});
+
+serve({ fetch: app.fetch, port: 3000 }, (info) => {
   console.log(`Listening on http://localhost:${info.port}`);
 });
