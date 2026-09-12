@@ -12,7 +12,7 @@ export const generateId = (): number => {
 const allowedTransitions: Record<Status, Status[]> = {
   open: ['doing'],
   doing: ['open', 'done'],
-  done: [],
+  done: ['doing'],
 }
 
 export const canTransition = (from: Status, to: Status): boolean => {
