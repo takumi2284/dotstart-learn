@@ -10,3 +10,6 @@ dist/
 
 # OS が自動で作るファイル
 .DS_Store
+
+# Prisma Clientの生成物。schema.prismaから再生成できるので記録しない
+/src/generated/prisma
