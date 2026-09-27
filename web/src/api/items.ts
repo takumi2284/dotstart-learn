@@ -2,12 +2,15 @@ const BASE_URL = 'http://localhost:3000'
 
 export type Status = 'open' | 'doing' | 'done'
 
+export type Tag = { id: number; name: string }
+
 export type Item = {
   id: number
   title: string
   note: string
   rating: number
   status: Status
+  tags: Tag[]
   allowedTransitions: Status[]
 }
 
@@ -15,6 +18,7 @@ export type NewItem = {
   title: string
   note: string
   rating: number
+  tags: string[]
 }
 
 async function handleResponse<T>(res: Response): Promise<T> {
@@ -24,8 +28,9 @@ async function handleResponse<T>(res: Response): Promise<T> {
   return res.json() as Promise<T>
 }
 
-export async function fetchItems(): Promise<Item[]> {
-  const res = await fetch(`${BASE_URL}/items`)
+export async function fetchItems(tag?: string): Promise<Item[]> {
+  const url = tag ? `${BASE_URL}/items?tag=${encodeURIComponent(tag)}` : `${BASE_URL}/items`
+  const res = await fetch(url)
   return handleResponse<Item[]>(res)
 }
 

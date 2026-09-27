@@ -66,3 +66,18 @@ app.ts
 index.ts
   → app.ts のアプリをNodeで起動するだけ
 ```
+
+### フロントエンド
+
+```text
+web/src/api/items.ts
+  → fetchの呼び出しだけを持つ。repositories に相当
+
+web/src/components/*.tsx
+  → propsを受け取って表示するだけ。stateを持たない
+
+web/src/App.tsx
+  → 状態（state）の置き場所とつなぎ役。services に相当
+```
+
+バックエンドは `routes / services / repositories`、フロントエンドは `api / components / App`（状態の置き場所）に分ける。

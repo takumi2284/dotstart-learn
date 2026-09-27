@@ -25,6 +25,11 @@ export function ItemList({ items, onChangeStatus, onDelete }: Props) {
     <ul>
       {items.map((item) => (
         <li key={item.id} className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm mb-2">
+          <div className="flex flex-wrap gap-1 mb-1">
+            {item.tags.map((tag) => (
+              <span key={tag.id} className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700">{tag.name}</span>
+            ))}
+          </div>
           <p className="font-bold mb-1">{item.title}</p>
           <p className="text-amber-500">{renderStars(item.rating)}</p>
           <p className="text-gray-600">{item.note}</p>
