@@ -41,3 +41,28 @@ curl http://localhost:3000/health
 | `npm run dev` | 開発サーバーを起動（ファイル保存で自動再起動） |
 | `npm run build` | `dist/` にJavaScriptを出力 |
 | `npm run typecheck` | 型チェックのみ実行 |
+
+## 層の責務とディレクトリ構成
+
+```text
+routes/items.ts
+  → itemService を呼ぶだけ。HTTPの受け口
+
+services/itemService.ts
+  → 存在チェックと状態遷移のルール。itemRepository を呼ぶ
+
+repositories/itemRepository.ts
+  → Prisma Client を直接呼ぶ唯一の場所
+
+errors.ts
+  → NotFoundError / TransitionError の定義と、404 / 400 に変換するヘルパー
+
+db.ts
+  → Prisma Client のインスタンスを1つだけ作る
+
+app.ts
+  → ミドルウェア登録・ルーティングの組み立て・app.onError
+
+index.ts
+  → app.ts のアプリをNodeで起動するだけ
+```
