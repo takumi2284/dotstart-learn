@@ -13,9 +13,16 @@ datasource db {
 }
 
 model Item {
-  id     Int    @id @default(autoincrement())
+  id     Int     @id @default(autoincrement())
   title  String
   note   String?
   rating Int
-  status String @default("open")
+  status String  @default("open")
+  tags   Tag[]
+}
+
+model Tag {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  items Item[]
 }
