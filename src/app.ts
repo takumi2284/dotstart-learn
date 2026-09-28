@@ -6,7 +6,8 @@ import { NotFoundError, TransitionError, notFoundError, badRequestError } from '
 
 const app = new Hono()
 
-app.use('*', cors())
+const allowedOrigin = process.env.ALLOWED_ORIGIN ?? 'http://localhost:5173'
+app.use('*', cors({ origin: allowedOrigin }))
 app.use('*', logger())
 
 app.get('/health', (c) => c.json({ status: 'ok' }))

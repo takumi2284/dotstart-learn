@@ -13,3 +13,8 @@ dist/
 
 # Prisma Clientの生成物。schema.prismaから再生成できるので記録しない
 /src/generated/prisma
+
+# Vercel CLI がローカルに作る紐付け情報
+.vercel/
+.vercel
+.env*
