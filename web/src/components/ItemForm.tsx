@@ -1,0 +1,71 @@
+import { useState } from 'react'
+import type { FormEvent } from 'react'
+import type { NewItem } from '../api/items'
+
+type Props = {
+  onCreate: (input: NewItem) => void
+}
+
+export function ItemForm({ onCreate }: Props) {
+  const [title, setTitle] = useState('')
+  const [note, setNote] = useState('')
+  const [rating, setRating] = useState(3)
+  const [tagsInput, setTagsInput] = useState('')
+
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (title.trim() === '') return
+
+    const tags = tagsInput
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0)
+
+    onCreate({ title, note, rating, tags })
+    setTitle('')
+    setNote('')
+    setRating(3)
+    setTagsInput('')
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-wrap items-center gap-2 mb-6">
+      <label className="text-sm text-gray-700" htmlFor="title">タイトル</label>
+      <input
+        id="title"
+        type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+      />
+      <label className="text-sm text-gray-700" htmlFor="note">メモ</label>
+      <input
+        id="note"
+        type="text"
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+      />
+      <label className="text-sm text-gray-700" htmlFor="tags">ラベル（カンマ区切り）</label>
+      <input
+        id="tags"
+        type="text"
+        value={tagsInput}
+        onChange={(e) => setTagsInput(e.target.value)}
+        className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+      />
+      <label className="text-sm text-gray-700" htmlFor="rating">評価</label>
+      <select
+        id="rating"
+        value={rating}
+        onChange={(e) => setRating(Number(e.target.value))}
+        className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+      >
+        {[1, 2, 3, 4, 5].map((n) => (
+          <option key={n} value={n}>{n}</option>
+        ))}
+      </select>
+      <button type="submit" className="rounded-md bg-gray-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-700">追加する</button>
+    </form>
+  )
+}
