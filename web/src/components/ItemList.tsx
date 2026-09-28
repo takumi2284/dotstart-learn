@@ -22,9 +22,9 @@ export function ItemList({ items, onChangeStatus, onDelete }: Props) {
   }
 
   return (
-    <ul>
+    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
       {items.map((item) => (
-        <li key={item.id} className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm mb-2">
+        <li key={item.id} className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
           <div className="flex flex-wrap gap-1 mb-1">
             {item.tags.map((tag) => (
               <span key={tag.id} className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700">{tag.name}</span>
